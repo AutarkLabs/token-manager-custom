@@ -1,6 +1,15 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Button, Field, IconCross, Text, TextInput, Info } from '@aragon/ui'
+import {
+  Button,
+  Field,
+  IconCross,
+  Info,
+  TextInput,
+  GU,
+  textStyle,
+  useTheme,
+} from '@aragon/ui'
 import { isAddress } from '../../web3-utils'
 import { fromDecimals, toDecimals, formatBalance } from '../../utils'
 import LocalIdentitiesAutoComplete from '../LocalIdentitiesAutoComplete/LocalIdentitiesAutoComplete'
@@ -23,7 +32,7 @@ const initialState = {
   },
 }
 
-class AssignVotePanelContent extends React.Component {
+class TokenPanelContent extends React.Component {
   static defaultProps = {
     onUpdateTokens: () => {},
   }
@@ -38,7 +47,7 @@ class AssignVotePanelContent extends React.Component {
       this._holderInput.current &&
         setTimeout(
           () => this._holderInput.current && this._holderInput.current.focus(),
-          0
+          100 // focusing too soon will cause the SidePanel's opening animation to be skipped
         )
 
       // Upadte holder address from the props
@@ -81,10 +90,10 @@ class AssignVotePanelContent extends React.Component {
           (mode === 'assign'
             ? `
               The maximum amount of tokens that can be assigned has already been
-              reached.
+              reached
             `
             : `
-              This account doesn’t have any tokens to remove.
+              This account doesn’t have any tokens to remove
             `),
       },
     }))
@@ -106,7 +115,7 @@ class AssignVotePanelContent extends React.Component {
     const holderError = !isAddress(holderAddress)
       ? `
         ${mode === 'assign' ? 'Recipient' : 'Account'}
-        must be a valid Ethereum address.
+        must be a valid Ethereum address
       `
       : null
 
@@ -136,16 +145,29 @@ class AssignVotePanelContent extends React.Component {
 
     const errorMessage = holderField.error || amountField.error
     const warningMessage = holderField.warning || amountField.warning
+    const accountMaxed = amountField.max === '0'
+    const disabled = Boolean(
+      errorMessage ||
+        accountMaxed ||
+        !holderField.value ||
+        !amountField.value ||
+        amountField.value === '0'
+    )
 
     return (
       <div>
-        <form onSubmit={this.handleSubmit}>
+        <form
+          css={`
+            margin-top: ${3 * GU}px;
+          `}
+          onSubmit={this.handleSubmit}
+        >
           <InfoMessage
             title="Action"
             text={`This action will ${
               mode === 'assign'
-                ? 'mint tokens to the recipient below'
-                : 'burn tokens from the account below'
+                ? 'create tokens and transfer them to the recipient below'
+                : 'remove tokens from the account below'
             }.`}
           />
           <Field
@@ -170,21 +192,20 @@ class AssignVotePanelContent extends React.Component {
               onChange={this.handleAmountChange}
               min={minTokenStep}
               max={amountField.max}
-              disabled={amountField.max === '0'}
+              disabled={accountMaxed}
               step={minTokenStep}
               required
               wide
             />
           </Field>
-          <Button
-            mode="strong"
-            type="submit"
-            disabled={amountField.max === '0'}
-            wide
-          >
+          <Button mode="strong" type="submit" disabled={disabled} wide>
             {mode === 'assign' ? 'Add' : 'Remove'} tokens
           </Button>
-          <div css="margin-top: 15px">
+          <div
+            css={`
+              margin-top: ${2 * GU}px;
+            `}
+          >
             {errorMessage && <ErrorMessage message={errorMessage} />}
             {warningMessage && <WarningMessage message={warningMessage} />}
           </div>
@@ -196,31 +217,51 @@ class AssignVotePanelContent extends React.Component {
 
 const Message = styled.div`
   & + & {
-    margin-top: 15px;
+    margin-top: ${2 * GU}px;
   }
 `
 
 const InfoMessage = ({ title, text }) => (
-  <div css="margin-bottom: 20px">
-    <Info.Action title={title}>{text}</Info.Action>
+  <div
+    css={`
+      margin-bottom: ${3 * GU}px;
+    `}
+  >
+    <Info title={title}>{text}</Info>
   </div>
 )
 
 const WarningMessage = ({ message }) => (
   <Message>
-    <Info.Action>{message}</Info.Action>
+    <Info mode="warning">{message}</Info>
   </Message>
 )
 
-const ErrorMessage = ({ message }) => (
-  <Message>
-    <p>
-      <IconCross />
-      <Text size="small" style={{ marginLeft: '10px' }}>
+const ErrorMessage = ({ message }) => {
+  const theme = useTheme()
+  return (
+    <Message
+      css={`
+        display: flex;
+        align-items: center;
+      `}
+    >
+      <IconCross
+        size="tiny"
+        css={`
+          color: ${theme.negative};
+          margin-right: ${1 * GU}px;
+        `}
+      />
+      <span
+        css={`
+          ${textStyle('body3')}
+        `}
+      >
         {message}
-      </Text>
-    </p>
-  </Message>
-)
+      </span>
+    </Message>
+  )
+}
 
-export default AssignVotePanelContent
+export default TokenPanelContent
