@@ -1,5 +1,5 @@
 /*
- * SPDX-License-Identitifer:    GPL-3.0-or-later
+ * SPDX-License-Identifier:    GPL-3.0-or-later
  */
 
 /* solium-disable function-order */
@@ -14,9 +14,8 @@ import "@aragon/os/contracts/lib/math/SafeMath.sol";
 import "@aragon/apps-shared-minime/contracts/ITokenController.sol";
 import "@aragon/apps-shared-minime/contracts/MiniMeToken.sol";
 
-interface ITransferOracle {
-    function getTransferability(address _from, address _to, uint256 _amount) external returns(bool);
-}
+import { ITransferOracle } from "@autark/apps-whitelist-oracle/contracts/WhitelistOracle.sol";
+
 
 contract TokenManager is ITokenController, IForwarder, AragonApp {
     using SafeMath for uint256;
@@ -34,7 +33,7 @@ contract TokenManager is ITokenController, IForwarder, AragonApp {
     bytes32 public constant REVOKE_VESTINGS_ROLE = 0x95ffc68daedf1eb334cfcd22ee24a5eeb5a8e58aa40679f2ad247a84140f8d6e;
     bytes32 public constant BURN_ROLE = 0xe97b137254058bd94f28d2f3eb79e2d34074ffb488d042e3bc958e0a57d2fa22;
     bytes32 public constant SET_ORACLE = 0x11eba3f259e2be865238d718fd308257e3874ad4b3a642ea3af386a4eea190bd;
-    
+
     uint256 public constant MAX_VESTINGS_PER_ADDRESS = 50;
 
     string private constant ERROR_CALLER_NOT_TOKEN = "TM_CALLER_NOT_TOKEN";
@@ -63,7 +62,7 @@ contract TokenManager is ITokenController, IForwarder, AragonApp {
     ITransferOracle public oracle;
     uint256 public maxAccountTokens;
 
-    // We are mimicing an array in the inner mapping, we use a mapping instead to make app upgrade more graceful
+    // We are mimicking an array in the inner mapping, we use a mapping instead to make app upgrade more graceful
     mapping (address => mapping (uint256 => TokenVesting)) internal vestings;
     mapping (address => uint256) public vestingsLengths;
 
@@ -83,7 +82,7 @@ contract TokenManager is ITokenController, IForwarder, AragonApp {
     }
 
     /**
-    * @notice Initialize Token Manager for `_token.symbol(): string`, whose tokens are `_transferable ? 'not' : ''` transferable`_maxAccountTokens > 0 ? ' and limited to a maximum of ' + @tokenAmount(_token, _maxAccountTokens, false) + ' per account' : ''`
+    * @notice Initialize Token Manager for `_token.symbol(): string`, whose tokens are `_transferable ? '' : 'not'` transferable`_maxAccountTokens > 0 ? ' and limited to a maximum of ' + @tokenAmount(_token, _maxAccountTokens, false) + ' per account' : ''`
     * @param _token MiniMeToken address for the managed token (Token Manager instance must be already set as the token controller)
     * @param _transferable whether the token can be transferred by holders
     * @param _maxAccountTokens Maximum amount of tokens an account can have (0 for infinite tokens)
@@ -216,7 +215,7 @@ contract TokenManager is ITokenController, IForwarder, AragonApp {
         delete vestings[_holder][_vestingId];
 
         // transferFrom always works as controller
-        // onTransfer hook always allows if transfering to token controller
+        // onTransfer hook always allows if transferring to token controller
         require(token.transferFrom(_holder, address(this), nonVested), ERROR_REVOKE_TRANSFER_FROM_REVERTED);
 
         emit RevokeVesting(_holder, _vestingId, nonVested);
@@ -238,7 +237,7 @@ contract TokenManager is ITokenController, IForwarder, AragonApp {
     */
     function onTransfer(address _from, address _to, uint256 _amount) external onlyToken returns (bool) {
         bool transferability = true;
-        if(_from != address(this) && address(oracle) != address(0x0)){
+        if (_from != address(this) && address(oracle) != address(0x0)) {
             transferability = oracle.getTransferability(_from, _to, _amount);
         }
         bool balanceIncreaseAllowed = _isBalanceIncreaseAllowed(_to, _amount) && _transferableBalance(_from, getTimestamp()) >= _amount;
@@ -353,7 +352,7 @@ contract TokenManager is ITokenController, IForwarder, AragonApp {
     }
 
     /**
-    * @dev Calculate amount of non-vested tokens at a specifc time
+    * @dev Calculate amount of non-vested tokens at a specific time
     * @param tokens The total amount of tokens vested
     * @param time The time at which to check
     * @param start The date vesting started
