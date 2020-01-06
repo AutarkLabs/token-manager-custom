@@ -1,0 +1,5 @@
+{
+  "hoist": true,
+  "packages": ["apps/*"],
+  "version": "independent"
+}
