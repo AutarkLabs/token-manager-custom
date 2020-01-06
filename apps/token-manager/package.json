@@ -1,6 +1,6 @@
 {
   "name": "@autarklabs/apps-token-manager-custom",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "main": "index.js",
   "scripts": {
     "compile": "truffle compile",
@@ -44,8 +44,8 @@
   },
   "dependencies": {
     "@aragon/apps-shared-minime": "1.0.0",
-    "@autarklabs/apps-whitelist-oracle": "^0.0.0",
-    "@aragon/os": "4.2.0"
+    "@aragon/os": "4.2.0",
+    "@autarklabs/apps-whitelist-oracle": "^0.0.1"
   },
   "publishConfig": {
     "access": "public"
