@@ -38,6 +38,7 @@ pids
 *.seed
 *.pid.lock
 
-# truffle build artifacts
+# build artifacts
 */**/abi
 */**/build
+*/**/dist

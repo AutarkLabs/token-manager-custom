@@ -2,7 +2,7 @@
   "environments": {
     "default": {
       "registry": "0x5f6f7e8cc7346a11ca2def8f827b7a0b612c56a1",
-      "appName": "whitelist-oracle.aragonpm.eth",
+      "appName": "whitelist-oracle.hatch.aragonpm.eth",
       "network": "rpc"
     },
     "rinkeby": {
@@ -25,9 +25,9 @@
       "appName": "whitelist-oracle.aragonpm.eth",
       "network": "ropsten"
     },
-    "rinkeby-old": {
-      "registry": "0xfbae32d1cde62858bc45f51efc8cc4fa1415447e",
-      "appName": "whitelist-oracle.aragonpm.eth",
+    "rinkeby-hatch": {
+      "registry": "0x98df287b6c145399aaa709692c8d308357bc085d",
+      "appName": "whitelist-oracle.hatch.aragonpm.eth",
       "network": "rinkeby"
     }
   },

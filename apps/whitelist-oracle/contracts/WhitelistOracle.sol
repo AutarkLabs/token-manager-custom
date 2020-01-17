@@ -37,19 +37,25 @@ contract WhitelistOracle is AragonApp, ITransferOracle {
         }
     }
 
+    /**
+     * @notice Add `_sender` to the whitelist
+     */
     function addSender(address _sender) external auth(ADD_SENDER_ROLE) {
         require(!validSender[_sender], ERROR_SENDER_ALREADY_ADDED);
         validSender[_sender] = true;
         emit ValidSenderAdded(_sender);
     }
 
+    /**
+     * @notice Remove `_sender` from the whitelist
+     */
     function removeSender(address _sender) external auth(REMOVE_SENDER_ROLE) {
         require(validSender[_sender], ERROR_SENDER_NOT_EXIST);
         validSender[_sender] = false;
         emit ValidSenderRemoved(_sender);
     }
 
-    function getTransferability(address _from, address /*_to*/, uint256 /*_amount*/) external returns (bool) {
+    function getTransferability(address _from, address /*_to*/, uint256 /*_amount*/) external isInitialized returns (bool) {
         return validSender[_from];
     }
 
