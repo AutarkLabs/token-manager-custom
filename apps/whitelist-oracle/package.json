@@ -1,6 +1,6 @@
 {
   "name": "@autarklabs/apps-whitelist-oracle",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "scripts": {
     "compile": "truffle compile",
     "apm:prepublish": "npm run compile",
